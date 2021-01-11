@@ -16,7 +16,7 @@ spring:
   profiles: mysql
   datasource:
     hikari:
-      jdbc-url: jdbc:mysql://localhost:3306/spring_batch?characterEncoding=UTF-8&serverTimezone=UTC
+      jdbc-url: jdbc:mysql://localhost:3306/spring_batch_test?characterEncoding=UTF-8&serverTimezone=UTC
       username: root
       password: 123321
       driver-class-name: com.mysql.jdbc.Driver
