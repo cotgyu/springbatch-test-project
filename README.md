@@ -132,6 +132,31 @@
 		-	동시에 여러 Job을 실행하려는 경우 또는 테스트 코드로 Job을 실행해야할 때 문제가 발생할 수 있음
 		-	Late Binding 불가
 
+### 6챕터 - Chunk 지향 처리
+
+-	Chunk
+
+	-	데이터 덩어리로 작업할 때 각 커밋 사이에 처리되는 row 수
+
+-	Chunk 지향 처리
+
+	-	한 번에 하나씩 데이터를 읽어 Chunk라는 덩어리를 만든 뒤, Chunk 단위로 트랜잭션을 다루는 것
+
+	-	실패할 경우 Chunk 만큼 롤백됨
+
+	-	Chunk 지향 처리의 전체 로직을 다루는 것은 ChunkOrientedTasklet 클래스
+
+-	Page Size vs Chunk Size
+
+	-	PagingItemReader를 사용할 때 Page Size와 Chunk Size를 같은 의미로 오해할 수 있음
+	-	Chunk Size : 한 번에 처리될 트랜잭션 단위
+	-	Page Size : 한 번에 조회할 item의 양
+
+	-	ex) Page Size 가 10이고, ChunkSize가 50이면 ItemReader에서 Page 조회가 5번 일어나면 1번의 트랜잭션이 발생하여 Chunk가 처리됨
+
+	-	2개 값을 일치하는 것이 보편적으로 좋은 방법임 (성능)
+
+
 ---
 
 -	오류메모
