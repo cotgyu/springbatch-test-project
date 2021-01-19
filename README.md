@@ -157,6 +157,90 @@
 	-	2개 값을 일치하는 것이 보편적으로 좋은 방법임 (성능)
 
 
+
+### 7챕터 - ItemReader
+
+-	Step은 Tasklet 단위로 처리되고, Tasklet 중에서 ChunkOrientedTasklet 을 통해 Chunk를 처리하며 이를 구성하는 요소로 ItemReader, ItemWriter, ItemProcessor 가 있다.
+
+-	(데이터) ->(읽기) ItemReader -> ItemProcessor -> ItemWriter ->(쓰기) -> 데이터
+
+-	Spring Batch의 ItemReader는 데이터를 읽어들임. (DB뿐만 아니라 File, XML, JOSN 등 다른 데이터 소스를 배치 처리의 입력으로 사용 가능)
+
+	-	Spring Batch에서 지원하지 않는 Reader가 필요할 경우 직접 Reader를 만들 수 있음
+
+-	ItemStream 인터페이스
+
+	-	주기적으로 상태를 저장하고 오류가 발생하면 해당 상태에서 복원하기 위한 마커 인터페이스
+	-	배치 프로세스의 실행 컨텍스트와 연계해서 ItemReader의 상태를 저장하고 실패한 곳에서 다시 실행할 수 있게 해주는 역할을 함
+
+-	Spring Batch 는 2개의 Reader 타입을 지원함
+
+	-	Cursor
+
+		-	JDBC ResultSet의 기본 기능
+		-	ResultSet이 open될 때마다 next() 메서드가 호출되어 Database의 데이터가 반환됨.
+
+	-	Paging
+
+		-	페이지라는 Chunk로 Database에서 데이터를 검색
+		-	페이지 단위로 한번에 데이터 조회
+
+	-	Cursor 기반 ItemReader 구현체
+
+		-	JdbcCursorItemReader
+		-	HibernateCursorItemReader
+		-	StoredProcedureItemReader
+
+	-	Paging 기반 ItemReader 구현체
+
+		-	JdbcPagingItemReader
+		-	HibernatePagingItemReader
+		-	JpaPagingItemReader
+
+-	CursorItemReader
+
+	-	Streaming으로 데이터를 처리
+
+	-	장점
+
+		-	데이터를 Streaming 할 수 있음
+		-	read() 메서드는 데이터를 하나씩 가져와 ItemWriter로 데이터를 전달하고, 다음 데이터를 다시 가져옴
+		-	reader & processor & writer가 chunk 단위로 수행되고 주기적으로 Commit 됨
+
+	-	주의사항
+
+		-	CursorItemReader를 사용할 때는 Database와 SocketTimeout을 충분히 큰 값으로 설정해야 함
+		-	Cursor는 하나의 Connection으로 Batch가 끝날때까지 사용되기 때문에 Batch가 끝나기전에 Database와 어플리케이션의 Connection이 먼저 끊어질 수 있음
+		-	Batch 수행 시간이 오래걸리는 경우에는 PagingItemReader를 사용하는게 낫다
+
+-	PagingItemReader
+
+	-	Cursor를 사용하는 대신 여러 쿼리를 실행하여 각 쿼리가 결과의 일부를 가져오는 방법
+
+	-	Spring Batch에서는 SqlPagingQueryProviderFactoryBean을 통해 Datasource 설정값을 보고 위 이미지에서 작성된 Provider중 하나를 자동으로 선택하도록 함
+
+-	JpaPagingItemReader
+
+	-	ORM으로 데이터를 단순한 값으로만 보는게 아닌, 객체로 볼 수 있게 됨
+	-	Batch 역시 JPA를 지원하기 위해 JpaPagingItemReader 를 지원함
+
+		-	Querydsl, Jooq 등을 통한 구현체는 지원하지 않음
+
+	-	PagingItemReader 주의 사항
+
+		-	정렬(Order)가 무조건 포함되어있어야 함
+
+-	ItemReader 주의사항
+
+	-	JpaRepository를 ListItemReader, QueueItemReader에 사용하면 안됨
+		-	ex) new ListItemReader<>(jpaRepository.findByAge(age))
+		-	이렇게 하면 Spring Batch 장점인 페이징 & Cursor 구현이 없어 대규모 데이터 처리가 불가능함 (Chunk 단위 트랜잭션은 됨)
+		-	써야한다면 RepositoryItemReader 사용 
+
+
+	- Hibernate, JPA 등 영속성 컨텍스트가 필요한 Reader 사용 시 fetchSize와 ChunkSize는 같은 값을 유지해야 함
+
+
 ---
 
 -	오류메모
