@@ -241,6 +241,45 @@
 	- Hibernate, JPA 등 영속성 컨텍스트가 필요한 Reader 사용 시 fetchSize와 ChunkSize는 같은 값을 유지해야 함
 
 
+### 8챕터 - ItemWriter
+
+-	Writer는 Reader, Processor와 함께 ChunkOrientedTasklet 구성
+
+	-	Processor 는 선택 (나머진 필수)
+
+-	ItemWriter는 SpringBatch에서 사용하는 출력 기능
+
+	-	ItemWriter는 업데이트 이후 item 하나를 작성하지 않고 Chunk 단위로 묶인 item List 를 다룸
+
+	-	ItemReader는 각 항목을 개별적으로 읽음
+
+	-	즉, Reader와 Processor를 거쳐 처리된 Item을 Chunk 단위 만큼 쌓은 뒤 이를 Writer에 전달
+
+-	JdbcBatchItemWriter
+
+	-	ORM을 사용하지 않는 Writer는 대부분 JdbcBatchItemWriter 사용
+	-	쿼리를 모아서 한번에 전송함
+
+	-	JdbcBatchItemWriterBuilder
+
+		-	beanMapped : Pojo 기반으로 Insert SQL 의 Values 매핑
+		-	columnMapped : Key,Value 기반으로 Insert SQL 의 Values 매핑
+
+-	JpaItemWriter
+
+	-	ORM을 사용할 수 있는 JpaItemWriter
+	-	JdbcBatchItemWriter와 차이
+		-	Pay Entity 를 읽어서 Writer에는 Pay2 Entity 전달하는 processor 추가
+		-	넘어온 Item을 그대로 테이블에 반영되기 떄문
+
+-	Custom ItemWriter
+
+	-	Reader와 달리 Writer는 커스텀하게 구현해야할 일이 많음
+		-	Reader에서 읽어온 데이터를 RestTemplate으로 외부 API에 전달해야할 때
+		-	임시저장을 하고 비교하기 위해 싱글톤 객체에 값을 넣어야할 떄
+		-	여러 Entity를 동시에 save 해야할 때
+
+
 ---
 
 -	오류메모
