@@ -1,6 +1,7 @@
-package com.example.springbatchtestproject.itemReader;
+package com.example.springbatchtestproject.itemWriter;
 
 
+import com.example.springbatchtestproject.entity.Pay;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

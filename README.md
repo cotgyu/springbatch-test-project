@@ -280,6 +280,42 @@
 		-	여러 Entity를 동시에 save 해야할 때
 
 
+### 9챕터 - ItemProcessor
+
+-	ItemProcessor는 필수가 아님
+
+	-	데이터를 가공하고나 필터링하는 역할
+	-	Writer에서도 할 수 있으나 Reader, Writer와 별도의 단계로 분리되어 비즈니스 코드가 섞이는 것을 방지
+	-	Reader에서 넘겨준 데이터 개발견을 가공/처리 해줌
+
+-	일반적으로 사용하는 방법
+
+	-	변환
+		-	Reader에서 읽은 데이터를 원하는 타입으로 변환해서 Writer에 넘겨줄 수있음
+	-	필터
+		-	Reader에서 넘겨준 데이터를 Writer로 넘겨줄 것인지 결정
+		-	null을 반환하면 Writer에 전달되지 않음
+
+-	트랜잭션 범위
+
+	-	Spring Batch에서 트랜잭션 범위는 Chunk 단위
+	-	Reader에서 Entity를 반환해주었다면 Entity 간의 Lazy Loading 이 가능함
+
+-	ItemProcessor 구현체
+
+	-	종류
+
+		-	ItemProcessAdaptor
+		-	ValidationItemProcessor
+		-	CompositeItemProcessor
+
+	-	하지만, 대부분 Processor를 직접 구현할 때가 많고, 람다식으로 빠르게 구현할 때도 많음
+
+	-	그래서 ItemProcessAdaptor, ValidationItemProcessor 는 거의 사용하지 않음
+
+	- CompositeItemProcessor는 ItemProcessor 간의 체이닝을 지원하는 Processor로 간혹 필요
+
+
 ---
 
 -	오류메모
